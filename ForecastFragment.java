@@ -54,7 +54,7 @@ public class ForecastFragment extends Fragment {
 
         //  the ID of each menu item is specified in the R.menu.xml_file, the onCreateOptionsMenu adds
 //        menu items in addition to those created in the parent Activity, which overide items in the fragment class
-//                if they have the same ID.
+//                if they have the same ID. asdasdasdasd
 
         if (id == R.id.action_refresh) {
             Log.v(ForecastFragment.class.getSimpleName(),"`Refreshing!" );
