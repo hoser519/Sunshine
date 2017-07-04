@@ -95,7 +95,7 @@ public class ForecastFragment extends Fragment {
         // Get the  value (String) of the preference associated
        String valOfPref = prefs.getString(getString(R.string.key_edittextpref), "keyNotFound");
 
-       ListOfStuff.add(valOfPref);
+//       ListOfStuff.add(valOfPref);
 
       //  ArrayList<String> StuffToList = new ArrayList<String>(Arrays.asList((String[])ListOfStuff.toArray()));
 
@@ -117,11 +117,23 @@ public class ForecastFragment extends Fragment {
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
 
+                Log.v(ForecastFragment.class.getSimpleName(), "Position=" + position + " id=" + id); // Get one of the list items from our preferences
 
+            if (id == 1) {
                 Intent i = new Intent(getActivity(), DetailActivity.class);
                 i.putExtra("DATA_TO_PRINT", "DATA I WANT TO PRINT");
-            startActivity(i);
-
+                startActivity(i);
+            } else
+            if (id == 0) {
+                    Intent i = new Intent(getActivity(), LightTweak.class);
+                    i.putExtra("DATA_TO_PRINT", "DATA I WANT TO PRINT");
+                    startActivity(i);
+            }
+            if (id == 2) {
+                    Intent i = new Intent(getActivity(), TopLevel.class);
+                    i.putExtra("DATA_TO_PRINT", "DATA I WANT TO PRINT");
+                    startActivity(i);
+                }
 
             }
 
@@ -147,7 +159,17 @@ public class ForecastFragment extends Fragment {
         String newPrevVal = prefs.getString(getString(R.string.key_edittextpref), "keyNotFound");
         Log.v(ForecastFragment.class.getSimpleName(),"OnResume: ListOfStuff size=" +  ListOfStuff.size() + " newPrevVa=" + newPrevVal ); // Get one of the list items from our preferences
         // Index of ArrayList starts at 0.
-       ListOfStuff.set(ListOfStuff.size()-3, newPrevVal);
+       ListOfStuff.set(0, newPrevVal);
+        ListOfStuff.set(1, newPrevVal);
+        ListOfStuff.set(2, newPrevVal);
+        mForcastAdapter.notifyDataSetChanged();
+        Context context = getActivity();
+        CharSequence text = "updated value from preferences:"+newPrevVal;
+        int duration = Toast.LENGTH_LONG;
+//
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+
     }
     @Override
     public  void onPause () {
