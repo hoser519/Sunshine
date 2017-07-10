@@ -7,11 +7,11 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class LightTweak extends ActionBarActivity {
-    private  SeekBar ch0_seek_bar;
+    private  SeekBar ch0PwrSeekbar;
     private  TextView ch0_percent_view;
+    private int ch0Pwr;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,21 +19,23 @@ public class LightTweak extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ch0_setup();
         // Set focus on to Seekbar so we don't auto go to the TextView
-        ch0_seek_bar.setFocusable(true);
-        ch0_seek_bar.setFocusableInTouchMode(true);
-        ch0_seek_bar.requestFocus();
+        ch0PwrSeekbar.setFocusable(true);
+        ch0PwrSeekbar.setFocusableInTouchMode(true);
+        ch0PwrSeekbar.requestFocus();
     }
 
     public void ch0_setup( ){
-        ch0_seek_bar = (SeekBar)findViewById(R.id.ch0_seekbar);
+        ch0PwrSeekbar = (SeekBar)findViewById(R.id.ch0PwrSeekbar);
         ch0_percent_view =(TextView)findViewById(R.id.ch0_percent_view);
         ch0_percent_view.setText(0 + " %");
 
-        ch0_seek_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        ch0PwrSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 String percentProgress = progress + " %";
                 ch0_percent_view.setText(percentProgress);
+                ch0Pwr  = progress;
+                Log.v(LightTweak.class.getSimpleName(),"setOnSeekBarChangeListener progree="+progress);
 
             }
 

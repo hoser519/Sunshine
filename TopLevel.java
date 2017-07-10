@@ -5,18 +5,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 public class TopLevel extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -50,8 +43,28 @@ public class TopLevel extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment newContent = null;
+        Class fragmentClass;
+        switch (position) {
+            case 1:
+//                newContent = new LightingPowerLevel();
+                fragmentClass = LightingPowerLevel.class;
+                break;
+            default:
+                fragmentClass = LightingPowerLevel.class;
+//                newContent = new LightingPowerLevel();
+
+
+        }
+
+        try {
+            newContent =  (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, newContent)
                 .commit();
     }
 
@@ -67,6 +80,7 @@ public class TopLevel extends ActionBarActivity
                 mTitle = getString(R.string.title_section3);
                 break;
         }
+        restoreActionBar();
     }
 
     public void restoreActionBar() {
@@ -79,6 +93,7 @@ public class TopLevel extends ActionBarActivity
     /**
      * A placeholder fragment containing a simple view.
      */
+
     public static class PlaceholderFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
