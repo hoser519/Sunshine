@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,13 +38,74 @@ public class TopLevel extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        Log.v(TopLevel.class.getSimpleName(),"onCreate=");
+
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.v(TopLevel.class.getSimpleName(),"onStart=");
+
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.v(TopLevel.class.getSimpleName(),"onRestart=");
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.v(TopLevel.class.getSimpleName(),"onResume=");
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.v(TopLevel.class.getSimpleName(),"onPause=");
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v(TopLevel.class.getSimpleName(),"onStop=");
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.v(TopLevel.class.getSimpleName(),"onDestroy=");
+
+    }
+
+    @Override
+    // This is called by NavigationDrawerFragment each time it's created, or a drawer is selected. Whe device rotated this activity is recreated
+    // and this function is run again - so we need to detect if the fragment already exists (was created previously) in the fragment manager (the backstack). Otherwise
+    // this will overwrite the previous running fragmetn (which is restored automatically from backstack) and we will lose saved states.
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment newContent = null;
+
+        // update the main content by replacing fragments
+//    /    String s;
+//        if(position == 0)
+//        {
+//            s = LightingPowerLevel.;
+//        }
+//        else
+//        {
+//            s = SettingsFragment.TAg;
+//        }
+//        Fragment fragment;
         Class fragmentClass;
         switch (position) {
             case 1:
@@ -57,14 +119,20 @@ public class TopLevel extends ActionBarActivity
 
         }
 
+        newContent = fragmentManager.findFragmentByTag(s);
+
         try {
             newContent =  (Fragment) fragmentClass.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        Log.v(TopLevel.class.getSimpleName(),"Fragment Tag=" + newContent.getTag() + "toString="+newContent.toString());
+
+
+        String newContentTag = newContent.toString();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, newContent)
+                .replace(R.id.container, newContent, newContentTag)
                 .commit();
     }
 
@@ -89,6 +157,21 @@ public class TopLevel extends ActionBarActivity
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * A placeholder fragment containing a simple view.
