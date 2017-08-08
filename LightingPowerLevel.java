@@ -1,31 +1,50 @@
 package com.example.android.sunshine.app;
 
 
+import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
+import android.support.v4.app.FragmentActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LightingPowerLevel extends Fragment {
+public class LightingPowerLevel extends NavigationDrawerContentFragment  {
+
+    // Keep a reference to the NetworkFragment which owns the AsyncTask object
+    // that is used to execute network ops.
+    private NetworkFragment mNetworkFragment;
+
+    // Boolean telling us whether a download is in progress, so we don't trigger overlapping
+    // downloads with consecutive button clicks.
+    private boolean mConnected = false;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private SeekBar ch0_seek_bar;
+    public final static String Tag = "LightingPowerLevel";
+    public static final int DRAWER_MENU_ITEM_NUM = 0;
+
+    private SeekBar ch0SeekBar;
     private int ch0Pwr =0;
 
     private TextView ch0_percent_view;
     private View ch0PwrSeekbar;
 
+
+    public String getFormalName(){
+        return Tag;
+    }
 
     public LightingPowerLevel() {
         // Required empty public constructor
@@ -41,9 +60,17 @@ public class LightingPowerLevel extends Fragment {
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        ((TopLevel) activity).onSectionAttached(
+                getArguments().getInt(ARG_SECTION_NUMBER));
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(LightingPowerLevel.class.getSimpleName(),"onCreate=");
+        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), "192.168.0.65", 23);
 
     }
 
@@ -55,14 +82,14 @@ public class LightingPowerLevel extends Fragment {
 
         Log.v(LightingPowerLevel.class.getSimpleName(),"onCreateView=");
 
-        ch0_seek_bar =(SeekBar) ch0PwrSeekbar.findViewById(R.id.ch0PwrSeekbar);
+        ch0SeekBar =(SeekBar) ch0PwrSeekbar.findViewById(R.id.ch0PwrSeekbar);
         ch0_percent_view =  (TextView) ch0PwrSeekbar.findViewById(R.id.ch0_percent_view);
 
         ch0_setup();
         // Set focus on to Seekbar so we don't auto go to the TextView
-        ch0_seek_bar.setFocusable(true);
-        ch0_seek_bar.setFocusableInTouchMode(true);
-        ch0_seek_bar.requestFocus();
+        ch0SeekBar.setFocusable(true);
+        ch0SeekBar.setFocusableInTouchMode(true);
+        ch0SeekBar.requestFocus();
 
         return ch0PwrSeekbar;
     }
@@ -76,13 +103,14 @@ public class LightingPowerLevel extends Fragment {
             ch0Pwr = savedInstanceState.getInt("ch0Pwr");
             Log.v(LightingPowerLevel.class.getSimpleName(),"onActivityCreated restore="+ch0Pwr);
 
+
         }
     }
 
     @Override
     public void onResume () {
         super.onResume();
-      //  ch0_seek_bar.setProgress(ch0Pwr);
+      //  ch0SeekBar.setProgress(ch0Pwr);
         Log.v(LightingPowerLevel.class.getSimpleName(),"onResume=");
 
 
@@ -121,7 +149,8 @@ public class LightingPowerLevel extends Fragment {
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
        // ch0_percent_view.setText(44 + " %");
-       // ch0_seek_bar.setProgress(44);
+//        ch0SeekBar.setProgress(44);
+        ch0SeekBar.setProgress(ch0Pwr);
 
 
 
@@ -132,7 +161,7 @@ public class LightingPowerLevel extends Fragment {
         ch0_percent_view.setText(0 + " %");
 
 
-        ch0_seek_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        ch0SeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 String percentProgress = progress + " %";
@@ -186,10 +215,52 @@ public class LightingPowerLevel extends Fragment {
 
     }
 
-  //  @Override
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-//        ((TopLevel) activity).onSectionAttached(
-//                getArguments().getInt(ARG_SECTION_NUMBER));
-//    }
+
+
+/*
+    @Override
+    public void updateFromDownload(String result) {
+        if (result != null) {
+            mDataText.setText(result);
+        } else {
+            mDataText.setText(getString(R.string.connection_error));
+        }
+    }
+
+    @Override
+    public NetworkInfo getActiveNetworkInfo() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo;
+    }
+
+    @Override
+    public void finishDownloading() {
+        mDownloading = false;
+        if (mNetworkFragment != null) {
+            mNetworkFragment.cancelDownload();
+        }
+    }
+
+    @Override
+    public void onProgressUpdate(int progressCode, int percentComplete) {
+        switch(progressCode) {
+            // You can add UI behavior for progress updates here.
+            case Progress.ERROR:
+                break;
+            case Progress.CONNECT_SUCCESS:
+                break;
+            case Progress.GET_INPUT_STREAM_SUCCESS:
+                break;
+            case Progress.PROCESS_INPUT_STREAM_IN_PROGRESS:
+                mDataText.setText("" + percentComplete + "%");
+                break;
+            case Progress.PROCESS_INPUT_STREAM_SUCCESS:
+                break;
+        }
+    }
+
+    */
 }
+

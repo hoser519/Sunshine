@@ -28,16 +28,20 @@ public class TopLevel extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_top_level);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
+            setContentView(R.layout.activity_top_level);
 
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+            mNavigationDrawerFragment = (NavigationDrawerFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+            mTitle = getString(R.string.app_name);
+            Log.v(TopLevel.class.getSimpleName(), "getTitle=" + mTitle);
+
+        //    restoreActionBar();
+
+            // Set up the drawer.
+            mNavigationDrawerFragment.setUp(
+                    R.id.navigation_drawer,
+                    (DrawerLayout) findViewById(R.id.drawer_layout));
 
         Log.v(TopLevel.class.getSimpleName(),"onCreate=");
 
@@ -93,62 +97,66 @@ public class TopLevel extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment newContent = null;
+        NavigationDrawerContentFragment newContent = null;
 
-        // update the main content by replacing fragments
-//    /    String s;
-//        if(position == 0)
-//        {
-//            s = LightingPowerLevel.;
-//        }
-//        else
-//        {
-//            s = SettingsFragment.TAg;
-//        }
-//        Fragment fragment;
         Class fragmentClass;
         switch (position) {
-            case 1:
-//                newContent = new LightingPowerLevel();
-                fragmentClass = LightingPowerLevel.class;
+            case LightingPowerLevel.DRAWER_MENU_ITEM_NUM:
+                newContent =
+                        (NavigationDrawerContentFragment)fragmentManager.findFragmentByTag(LightingPowerLevel.Tag);
+                if (newContent==null)
+                    newContent = LightingPowerLevel.newInstance(position);
+                mTitle = getString(R.string.title_section1);
                 break;
             default:
-                fragmentClass = LightingPowerLevel.class;
-//                newContent = new LightingPowerLevel();
+                newContent =
+                        (NavigationDrawerContentFragment)fragmentManager.findFragmentByTag(LightingPowerLevel.Tag);
+                if (newContent==null)
+                    newContent = LightingPowerLevel.newInstance(position);
+                mTitle = getString(R.string.title_section1);
 
 
         }
 
-        newContent = fragmentManager.findFragmentByTag(s);
+        //onSectionAttached(position);
+        restoreActionBar();
 
-        try {
-            newContent =  (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        Log.v(TopLevel.class.getSimpleName(),"Fragment Tag=" + newContent.getTag() + "toString="+newContent.toString());
-
-
-        String newContentTag = newContent.toString();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, newContent, newContentTag)
+        Log.v(TopLevel.class.getSimpleName(),"Positio="+position+ "Fragment Tag=" + newContent.getTag() + "getFormalName=" + newContent.getFormalName());
+        if (newContent!=null)
+            fragmentManager.beginTransaction()
+                .replace(R.id.container, newContent, newContent.getFormalName())
                 .commit();
+
+
+        // A previous instance of this Fragment was not found, so create a new one
+    /*    if (newContent == null) {
+            try {
+                newContent = (NavigationDrawerContentFragment)fragmentClass.newInstance();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Log.v(TopLevel.class.getSimpleName(), "Fragment Tag=" + newContent.getTag() + "getFormalName=" + newContent.getFormalName());
+
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, newContent, newContent.getFormalName())
+                    .commit();
+        }*/
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
-            case 1:
+            case LightingPowerLevel.DRAWER_MENU_ITEM_NUM:
                 mTitle = getString(R.string.title_section1);
                 break;
-            case 2:
+            case 1:
                 mTitle = getString(R.string.title_section2);
                 break;
-            case 3:
+            case 2:
                 mTitle = getString(R.string.title_section3);
                 break;
         }
-        restoreActionBar();
     }
 
     public void restoreActionBar() {
@@ -164,33 +172,26 @@ public class TopLevel extends ActionBarActivity
 
 
 
+}
 
-
-
-
-
-
-
-
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-
+/**
+        * A placeholder fragment containing a simple view.
+        */
+/*
     public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
+        *//**
+ * The fragment argument representing the section number for this
+ * fragment.
+ *//*
         private static final String ARG_SECTION_NUMBER = "section_number";
 
         public PlaceholderFragment() {
         }
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
+        *//**
+ * Returns a new instance of this fragment for the given section
+ * number.
+ *//*
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
@@ -213,5 +214,104 @@ public class TopLevel extends ActionBarActivity
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
+package com.example.mike.myapplication;
 
-}
+        import android.os.Bundle;
+        import android.support.design.widget.FloatingActionButton;
+        import android.support.design.widget.Snackbar;
+        import android.view.View;
+        import android.support.design.widget.NavigationView;
+        import android.support.v4.view.GravityCompat;
+        import android.support.v4.widget.DrawerLayout;
+        import android.support.v7.app.ActionBarDrawerToggle;
+        import android.support.v7.app.AppCompatActivity;
+        import android.support.v7.widget.Toolbar;
+        import android.view.Menu;
+        import android.view.MenuItem;
+
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+}*/
