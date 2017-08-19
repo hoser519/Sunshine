@@ -14,14 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.support.v4.app.FragmentActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LightingPowerLevel extends NavigationDrawerContentFragment  {
+public class LightingPowerLevel extends NavigationDrawerContentFragment
+                                                     {
 
     // Keep a reference to the NetworkFragment which owns the AsyncTask object
     // that is used to execute network ops.
@@ -32,7 +30,7 @@ public class LightingPowerLevel extends NavigationDrawerContentFragment  {
     private boolean mConnected = false;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
-    public final static String Tag = "LightingPowerLevel";
+    public final static String TAG = "LightingPowerLevel";
     public static final int DRAWER_MENU_ITEM_NUM = 0;
 
     private SeekBar ch0SeekBar;
@@ -43,12 +41,16 @@ public class LightingPowerLevel extends NavigationDrawerContentFragment  {
 
 
     public String getFormalName(){
-        return Tag;
+        return TAG;
     }
 
     public LightingPowerLevel() {
         // Required empty public constructor
     }
+
+
+
+
 
     public static LightingPowerLevel newInstance(int sectionNumber) {
 
@@ -59,18 +61,24 @@ public class LightingPowerLevel extends NavigationDrawerContentFragment  {
         return fragment;
     }
 
+
+    // Fragment lifecycle
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((TopLevel) activity).onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
+
+
+
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(LightingPowerLevel.class.getSimpleName(),"onCreate=");
-        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), "192.168.0.65", 23);
+        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), "192.168.0.65", 9000);
 
     }
 
@@ -160,20 +168,38 @@ public class LightingPowerLevel extends NavigationDrawerContentFragment  {
 
         ch0_percent_view.setText(0 + " %");
 
-
         ch0SeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            private int startProgress;
+            private int lastProgress;
+            private boolean justStarted;
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 String percentProgress = progress + " %";
+
+                if (justStarted) {
+                    if (progress > startProgress)
+                        mNetworkFragment.startNetworkIO("U");
+                    else if (progress < startProgress)
+                        mNetworkFragment.startNetworkIO("D");
+                       justStarted = false;
+                } else {
+                    if (progress > lastProgress)
+                        mNetworkFragment.startNetworkIO("U");
+                    else if (progress < lastProgress)
+                        mNetworkFragment.startNetworkIO("D");
+                }
+                lastProgress = progress;
+
                 ch0_percent_view.setText(percentProgress);
                 ch0Pwr  = progress;
-                Log.v(LightingPowerLevel.class.getSimpleName(),"setOnSeekBarChangeListener progree="+progress);
+                //Log.v(LightingPowerLevel.class.getSimpleName(),"setOnSeekBarChangeListener progree="+progress);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 Log.v(LightingPowerLevel.class.getSimpleName(),"onStartTrackingTouch - start ");
-
+                startProgress = seekBar.getProgress();
+                justStarted = true;
             }
 
             @Override

@@ -38,6 +38,6 @@ public interface NetworkIOCallback {
      * Indicates that the download operation has finished. This method is called even if the
      * download hasn't completed successfully.
      */
-    void finishDownloading();
+    void cancelNetworkIO();
 
 }

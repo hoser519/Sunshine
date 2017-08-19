@@ -1,29 +1,84 @@
 package com.example.android.sunshine.app;
 
-import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
 public class TopLevel extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+                                                    NetworkIOCallback {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
+    // Keep a reference to the NetworkFragment which owns the AsyncTask object
+    // that is used to execute network ops.
+    private NetworkFragment mNetworkFragment;
+
+    // Boolean telling us whether a download is in progress, so we don't trigger overlapping
+    // downloads with consecutive button clicks.
+    private boolean mConnected = false;
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+
+
+    // Call back implementation for NetworkIOCallback
+
+    @Override
+    public void updateFromDownload(String result) {
+        if (result != null) {
+            Log.v(TopLevel.class.getSimpleName(),"Received from Server="+result);
+        } else {
+            Log.v(TopLevel.class.getSimpleName(),"Received from Server= Non");
+
+        }
+    }
+
+    @Override
+    public NetworkInfo getActiveNetworkInfo() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo;
+    }
+
+    @Override
+    public void onProgressUpdate(int progressCode, int percentComplete) {
+        switch(progressCode) {
+            // You can add UI behavior for progress updates here.
+            case Progress.ERROR:
+                break;
+            case Progress.CONNECT_SUCCESS:
+                break;
+            case Progress.GET_INPUT_STREAM_SUCCESS:
+                break;
+            case Progress.PROCESS_INPUT_STREAM_IN_PROGRESS:
+                //            mDataText.setText("" + percentComplete + "%");
+                break;
+            case Progress.PROCESS_INPUT_STREAM_SUCCESS:
+                break;
+        }
+    }
+    @Override
+    public void cancelNetworkIO() {
+        mConnected = false;
+        if (mNetworkFragment != null) {
+            mNetworkFragment.stopNetworkIO();
+        }
+    }
+
+
+    // Activity lifecycle
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +99,8 @@ public class TopLevel extends ActionBarActivity
                     (DrawerLayout) findViewById(R.id.drawer_layout));
 
         Log.v(TopLevel.class.getSimpleName(),"onCreate=");
+
+        mNetworkFragment = NetworkFragment.getInstance(getSupportFragmentManager(), "192.168.0.65", 9000);
 
     }
 
@@ -103,14 +160,14 @@ public class TopLevel extends ActionBarActivity
         switch (position) {
             case LightingPowerLevel.DRAWER_MENU_ITEM_NUM:
                 newContent =
-                        (NavigationDrawerContentFragment)fragmentManager.findFragmentByTag(LightingPowerLevel.Tag);
+                        (NavigationDrawerContentFragment)fragmentManager.findFragmentByTag(LightingPowerLevel.TAG);
                 if (newContent==null)
                     newContent = LightingPowerLevel.newInstance(position);
                 mTitle = getString(R.string.title_section1);
                 break;
             default:
                 newContent =
-                        (NavigationDrawerContentFragment)fragmentManager.findFragmentByTag(LightingPowerLevel.Tag);
+                        (NavigationDrawerContentFragment)fragmentManager.findFragmentByTag(LightingPowerLevel.TAG);
                 if (newContent==null)
                     newContent = LightingPowerLevel.newInstance(position);
                 mTitle = getString(R.string.title_section1);
@@ -121,7 +178,7 @@ public class TopLevel extends ActionBarActivity
         //onSectionAttached(position);
         restoreActionBar();
 
-        Log.v(TopLevel.class.getSimpleName(),"Positio="+position+ "Fragment Tag=" + newContent.getTag() + "getFormalName=" + newContent.getFormalName());
+        Log.v(TopLevel.class.getSimpleName(),"Positio="+position+ "Fragment TAG=" + newContent.getTag() + "getFormalName=" + newContent.getFormalName());
         if (newContent!=null)
             fragmentManager.beginTransaction()
                 .replace(R.id.container, newContent, newContent.getFormalName())
@@ -137,7 +194,7 @@ public class TopLevel extends ActionBarActivity
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Log.v(TopLevel.class.getSimpleName(), "Fragment Tag=" + newContent.getTag() + "getFormalName=" + newContent.getFormalName());
+            Log.v(TopLevel.class.getSimpleName(), "Fragment TAG=" + newContent.getTag() + "getFormalName=" + newContent.getFormalName());
 
             fragmentManager.beginTransaction()
                     .replace(R.id.container, newContent, newContent.getFormalName())
@@ -174,9 +231,11 @@ public class TopLevel extends ActionBarActivity
 
 }
 
+
+
 /**
-        * A placeholder fragment containing a simple view.
-        */
+ * A placeholder fragment containing a simple view.
+ */
 /*
     public static class PlaceholderFragment extends Fragment {
         *//**
