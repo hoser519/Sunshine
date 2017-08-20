@@ -70,7 +70,7 @@ public class MainActivity extends ActionBarActivity {
 
 
 // These will respond to drop menu items - Fragments can also add items to the menu and will inherit the ones declared by their parent Activity
-        if (id == R.id.action_doNothing) {
+        if (id == R.id.action_settings) {
 
 //                Intent launchSettings = new Intent(this, SettingsActivity.class);
 //                startActivity(launchSettings);

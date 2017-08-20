@@ -1,6 +1,7 @@
 package com.example.android.sunshine.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.ActionBarActivity;
@@ -9,6 +10,8 @@ import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class TopLevel extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -84,7 +87,7 @@ public class TopLevel extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-            setContentView(R.layout.activity_top_level);
+        setContentView(R.layout.activity_top_level);
 
             mNavigationDrawerFragment = (NavigationDrawerFragment)
                     getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -145,6 +148,27 @@ public class TopLevel extends ActionBarActivity
         super.onDestroy();
         Log.v(TopLevel.class.getSimpleName(),"onDestroy=");
 
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+// These will respond to drop menu items - Fragments can also add items to the menu and will inherit the ones declared by their parent Activity
+        if (id == R.id.action_settings) {
+            Intent launchSettings = new Intent(this, SettingsActivity.class);
+            startActivity(launchSettings);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

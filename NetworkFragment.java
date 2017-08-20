@@ -110,7 +110,7 @@ import java.net.Socket;
         }
 
         // If Network task exists and not cancelled, cancel it (if we are waiting for Soclet.connect
-        // it won't kill the task until it returns, and then will be killed).
+        // it won't kill the task until Socket.connect returns, and then will be killed calling onCancelled).
 
         public void stopNetworkIO() {
             if (mNetworkIOTask != null) {
