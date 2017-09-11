@@ -1,11 +1,15 @@
 package com.example.android.sunshine.app;
 
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+//import android.app.Fragment;
+
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -134,6 +138,12 @@ public class ForecastFragment extends Fragment {
                     i.putExtra("DATA_TO_PRINT", "DATA I WANT TO PRINT");
                     startActivity(i);
                 }
+
+            if (id == 3) {
+                String b = new String("ASDSD");
+                ConnectProgressDialogFragment ads = new ConnectProgressDialogFragment();
+                ads.show(getFragmentManager(),b);
+            }
 
             }
 

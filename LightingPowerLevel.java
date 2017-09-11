@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -39,8 +40,11 @@ public class LightingPowerLevel extends NavigationDrawerContentFragment
     private TextView ch0_percent_view;
     private View ch0PwrSeekbar;
 
+//    private ProgressBar spinner;
 
-    public String getFormalName(){
+
+
+     public String getFormalName(){
         return TAG;
     }
 
@@ -77,8 +81,7 @@ public class LightingPowerLevel extends NavigationDrawerContentFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(LightingPowerLevel.class.getSimpleName(),"onCreate=");
-        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager(), "192.168.0.65", 9000);
+        Log.v(LightingPowerLevel.class.getSimpleName(),"onCreate");
 
     }
 
@@ -88,31 +91,39 @@ public class LightingPowerLevel extends NavigationDrawerContentFragment
         // Inflate the layout for this fragment
         ch0PwrSeekbar = inflater.inflate(R.layout.fragment_lighting_power_level, container, false);
 
-        Log.v(LightingPowerLevel.class.getSimpleName(),"onCreateView=");
+        Log.v(LightingPowerLevel.class.getSimpleName(),"onCreateView");
 
         ch0SeekBar =(SeekBar) ch0PwrSeekbar.findViewById(R.id.ch0PwrSeekbar);
         ch0_percent_view =  (TextView) ch0PwrSeekbar.findViewById(R.id.ch0_percent_view);
+      //  spinner = (ProgressBar)ch0PwrSeekbar.findViewById(R.id.connectProgressBar);
+      //  spinner.setVisibility(View.VISIBLE);
 
-        ch0_setup();
+
         // Set focus on to Seekbar so we don't auto go to the TextView
         ch0SeekBar.setFocusable(true);
         ch0SeekBar.setFocusableInTouchMode(true);
         ch0SeekBar.requestFocus();
-
         return ch0PwrSeekbar;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+    // We can be sure at  this point that activity.create()
         if (savedInstanceState != null) {
             //Restore the fragment's state here
             ch0Pwr = savedInstanceState.getInt("ch0Pwr");
             Log.v(LightingPowerLevel.class.getSimpleName(),"onActivityCreated restore="+ch0Pwr);
 
 
+        } else {
+            // Only setup if this is not a
+            ch0_setup();
+
         }
+        // get out networkFragmnet
+        mNetworkFragment = NetworkFragment.getInstance(getFragmentManager());
+
     }
 
     @Override
@@ -127,21 +138,21 @@ public class LightingPowerLevel extends NavigationDrawerContentFragment
     @Override
     public void  onStart () {
         super.onStart();
-        Log.v(LightingPowerLevel.class.getSimpleName(),"onStart=");
+        Log.v(LightingPowerLevel.class.getSimpleName(),"onStart");
 
 
     }
     @Override
     public void  onPause () {
         super.onStart();
-        Log.v(LightingPowerLevel.class.getSimpleName(),"onPause=");
+        Log.v(LightingPowerLevel.class.getSimpleName(),"onPause");
 
 
     }
     @Override
     public void  onStop () {
         super.onStart();
-        Log.v(LightingPowerLevel.class.getSimpleName(),"onStop=");
+        Log.v(LightingPowerLevel.class.getSimpleName(),"onStop");
 
 
     }
@@ -176,17 +187,27 @@ public class LightingPowerLevel extends NavigationDrawerContentFragment
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 String percentProgress = progress + " %";
 
+                Log.v(LightingPowerLevel.class.getSimpleName(), "onProgressChanged: progress="+progress+" justStared="+justStarted+" startProgress="+startProgress+" lastProgress="+lastProgress);
+
                 if (justStarted) {
-                    if (progress > startProgress)
+                    if (progress > startProgress) {
+                        Log.v(LightingPowerLevel.class.getSimpleName(), "calling StartNetworkIO 1");
                         mNetworkFragment.startNetworkIO("U");
-                    else if (progress < startProgress)
-                        mNetworkFragment.startNetworkIO("D");
-                       justStarted = false;
+                    }      else if (progress < startProgress) {
+                        Log.v(LightingPowerLevel.class.getSimpleName(), "calling StartNetworkIO 2");
+                    mNetworkFragment.startNetworkIO("D");
+                    }
+                    justStarted = false;
                 } else {
-                    if (progress > lastProgress)
+                    if (progress > lastProgress) {
+                        Log.v(LightingPowerLevel.class.getSimpleName(), "calling StartNetworkIO 3");
+
                         mNetworkFragment.startNetworkIO("U");
-                    else if (progress < lastProgress)
+                    } else if (progress < lastProgress) {
+                        Log.v(LightingPowerLevel.class.getSimpleName(), "calling StartNetworkIO 4");
+
                         mNetworkFragment.startNetworkIO("D");
+                    }
                 }
                 lastProgress = progress;
 

@@ -7,11 +7,15 @@ import android.net.NetworkInfo;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
 public class TopLevel extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -29,10 +33,19 @@ public class TopLevel extends ActionBarActivity
     // Boolean telling us whether a download is in progress, so we don't trigger overlapping
     // downloads with consecutive button clicks.
     private boolean mConnected = false;
+
+    // The progress bar
+    private ProgressBar spinner;
+
+    FrameLayout progressBarOverlay;
+
+
+
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+
 
 
     // Call back implementation for NetworkIOCallback
@@ -60,8 +73,23 @@ public class TopLevel extends ActionBarActivity
         switch(progressCode) {
             // You can add UI behavior for progress updates here.
             case Progress.ERROR:
+                Log.v(TopLevel.class.getSimpleName(), "ERROR Invoked");
+                //spinner.setVisibility(View.GONE);
+                ConnectProgressDialogFragment errorDialog = new ConnectProgressDialogFragment();
+                errorDialog.show(getSupportFragmentManager(),ConnectProgressDialogFragment.TAG);
+                progressBarOverlay.setVisibility(View.GONE);
                 break;
             case Progress.CONNECT_SUCCESS:
+                Log.v(TopLevel.class.getSimpleName(), "CONNECT_SUCCESS Invoked");
+                if (percentComplete == 0) {
+                    progressBarOverlay.setVisibility(View.VISIBLE);
+                    //  spinner.setVisibility(View.VISIBLE);
+                }
+                else if (percentComplete == 100)
+
+                    progressBarOverlay.setVisibility(View.GONE);
+                   // spinner.setProgress(View.GONE);
+
                 break;
             case Progress.GET_INPUT_STREAM_SUCCESS:
                 break;
@@ -75,8 +103,9 @@ public class TopLevel extends ActionBarActivity
     @Override
     public void cancelNetworkIO() {
         mConnected = false;
+      //    spinner.setVisibility(View.GONE);
         if (mNetworkFragment != null) {
-            mNetworkFragment.stopNetworkIO();
+        //    mNetworkFragment.stopNetworkIO();
         }
     }
 
@@ -103,10 +132,16 @@ public class TopLevel extends ActionBarActivity
 
         Log.v(TopLevel.class.getSimpleName(),"onCreate=");
 
+
+      //  spinner = (ProgressBar)findViewById(R.id.connectProgressBar);
+
+        progressBarOverlay = (FrameLayout)findViewById(R.id.progressOverlay);
+
         mNetworkFragment = NetworkFragment.getInstance(getSupportFragmentManager(), "192.168.0.65", 9000);
+        getFragmentManager();
+
 
     }
-
 
     @Override
     protected void onStart() {

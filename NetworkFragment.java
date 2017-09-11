@@ -36,6 +36,11 @@ import java.net.Socket;
         /**
          * Static initializer for NetworkFragment that sets the IP and Port of the host it will be interfacing with
          */
+
+        public static NetworkFragment getInstance(FragmentManager fragmentManager) {
+            return getInstance(fragmentManager, "192.168.0.65", 9000);
+        }
+
         public static NetworkFragment getInstance(FragmentManager fragmentManager, String hostIP, int hostPort) {
             // Recover NetworkFragment in case we are re-creating the Activity due to a config change.
             // This is necessary because NetworkFragment might have a task that began running before
@@ -45,23 +50,32 @@ import java.net.Socket;
             NetworkFragment networkFragment = (NetworkFragment)
                                 fragmentManager.findFragmentByTag(NetworkFragment.TAG);
             if (networkFragment == null) {
+                Log.v(NetworkFragment.class.getSimpleName(), "getInstance:creating new fragment");
                 networkFragment = new NetworkFragment();
                 Bundle args = new Bundle();
                 args.putString(HOSTIP_KEY, hostIP);
                 args.putInt(HOSTPORT_KEY, hostPort);
                 networkFragment.setArguments(args);
                 fragmentManager.beginTransaction().add(networkFragment, NetworkFragment.TAG).commit();
+                // now execute the add operation immediately so it's visible next time we call fragmnetManager.getFragmentByTag()
+                fragmentManager.executePendingTransactions();
+
+            } else {
+                Log.v(NetworkFragment.class.getSimpleName(), "getInstance:Fragment already existed");
+
             }
             return networkFragment;
         }
 
         @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
+        public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             // Retain this Fragment across configuration changes in the host Activity.
-            setRetainInstance(true);
+          setRetainInstance(true);
+            Log.v(NetworkFragment.class.getSimpleName(), "onCreate");
             mIPString = getArguments().getString(HOSTIP_KEY);
             mPort = getArguments().getInt(HOSTPORT_KEY);
+
             // Connect to server
 
         }
@@ -69,6 +83,8 @@ import java.net.Socket;
         @Override
         public void onAttach(Activity parent) {
            super.onAttach(parent);
+            Log.v(NetworkFragment.class.getSimpleName(), "onAttach");
+
             // Host Activity will handle callbacks from task.
         try {
              mCallback = (NetworkIOCallback)parent;
@@ -76,10 +92,43 @@ import java.net.Socket;
         throw new ClassCastException(  " must implement NetworIOCallback");
     }
         }
+    @Override
+    public void onResume () {
+        super.onResume();
+        //  ch0SeekBar.setProgress(ch0Pwr);
+        Log.v(NetworkFragment.class.getSimpleName(),"onResume");
+
+
+    }
+
+    @Override
+    public void  onStart () {
+        super.onStart();
+        Log.v(NetworkFragment.class.getSimpleName(),"onStart");
+
+
+    }
+    @Override
+    public void  onPause () {
+        super.onStart();
+        Log.v(NetworkFragment.class.getSimpleName(),"onPause");
+
+
+    }
+    @Override
+    public void  onStop () {
+        super.onStart();
+        Log.v(NetworkFragment.class.getSimpleName(),"onStop");
+
+
+    }
+
 
         @Override
         public void onDetach() {
             super.onDetach();
+            Log.v(NetworkFragment.class.getSimpleName(), "onDetach");
+
             // Clear reference to host Activity.
             mCallback = null;
         }
@@ -87,6 +136,8 @@ import java.net.Socket;
         @Override
         public void onDestroy() {
             // Cancel task when Fragment is destroyed.
+            Log.v(NetworkFragment.class.getSimpleName(), "onDestroy");
+
             stopNetworkIO();
             if (mTcpClient != null)
                 if (mTcpClient.isConnected())
@@ -109,7 +160,7 @@ import java.net.Socket;
 
         }
 
-        // If Network task exists and not cancelled, cancel it (if we are waiting for Soclet.connect
+        // If Network task exists and not cancelled, cancel it (if we are waiting for Socket.connect
         // it won't kill the task until Socket.connect returns, and then will be killed calling onCancelled).
 
         public void stopNetworkIO() {
@@ -134,7 +185,6 @@ import java.net.Socket;
                 }
             }
         }
-
 
 
         /**
@@ -195,10 +245,8 @@ import java.net.Socket;
                         if (mTcpClient.isConnected()){
                             // Send any pending message. If we couldn't send close socket and throw the error
                             try {
-                                Log.v(NetworkFragment.class.getSimpleName(), "Tryingto send");
 
                                 mTcpClient.sendMessage(cmd);
-                                Log.v(NetworkFragment.class.getSimpleName(), "success");
 
                             } catch (IOException e) {
                                 mTcpClient.disconnect();
@@ -208,7 +256,15 @@ import java.net.Socket;
                             // TODO: Receive any data
 
                         } else {
-                            mTcpClient.connect();
+                            //
+                            publishProgress(NetworkIOCallback.Progress.CONNECT_SUCCESS,0);
+                            try {
+                                mTcpClient.connect();
+                            } catch (Exception e) {
+                                publishProgress(NetworkIOCallback.Progress.ERROR,0);
+                                throw e;
+                            }
+                            publishProgress(NetworkIOCallback.Progress.CONNECT_SUCCESS,100);
                         }
 
                         if (resultString != null) {
@@ -229,6 +285,7 @@ import java.net.Socket;
             @Override
             protected void onProgressUpdate(Integer... values) {
                 super.onProgressUpdate(values);
+                //Log.v(NetworkFragment.class.getSimpleName(), "onProgressUpdate");
                 if (values.length >= 2) {
                     mCallback.onProgressUpdate(values[0], values[1]);
                 }
@@ -250,7 +307,7 @@ import java.net.Socket;
                    //     Log.v(NetworkFragment.class.getSimpleName(),"Received from Server="+result);
 
                     }
-                    mCallback.cancelNetworkIO();
+                   mCallback.cancelNetworkIO();
                 }
             }
 
@@ -260,7 +317,7 @@ import java.net.Socket;
             @Override
             protected void onCancelled(Result result) {
                 Log.v(NetworkFragment.class.getSimpleName(),"onCancelled() called");
-
+               // mCallback.cancelNetworkIO();
             }
             }
 

@@ -3,7 +3,9 @@ package com.example.android.sunshine.app;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
+//import android.app.DialogFragment;
+import android.support.v4.app.DialogFragment;
+
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -11,8 +13,9 @@ import android.os.Bundle;
  * Created by mike on 8/19/2017.
  */
 
-@SuppressLint("NewApi")
 public class ConnectProgressDialogFragment extends DialogFragment {
+    final static String TAG = "ErrorDialog";
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
